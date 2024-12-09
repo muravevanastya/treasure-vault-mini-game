@@ -5,6 +5,7 @@ import doorImage from './assets/door.png'
 import handleImage from './assets/handle.png'
 import handleShadowImage from './assets/handleShadow.png'
 import doorOpenImage from './assets/doorOpen.png'
+import { log } from 'console'
 
 const app: PIXI.Application = new PIXI.Application()
 await app.init({ 
@@ -77,7 +78,7 @@ const resizeElements = () => {
   door.y = app.screen.height / 2 - 8
   door.scale.set(scale)
 
-  doorOpen.x = app.screen.width / 2 + 450
+  doorOpen.x = app.screen.width / 2 + 460
   doorOpen.y = app.screen.height / 2
   doorOpen.scale.set(scale)
 }
@@ -90,10 +91,81 @@ const openDoor = () => {
   doorOpen.visible = true
 }
 
-const button = document.getElementById('right-arrow')
-button.addEventListener('click', () => {  
-  openDoor()
-})
-
 app.renderer.on('resize', resizeElements);
 resizeElements();
+
+const generateCombination = (): number[] => {
+  const combination: number[] = []
+  for (let i = 0; i < 3; i++) {
+    const step: number = (Math.random() < 0.5 ? 1 : -1) * (Math.floor(Math.random() * 9) + 1);
+    combination.push(step)
+  }
+  return combination
+}
+
+const combination: number[] = generateCombination()
+
+combination.forEach((step) => {
+  console.log(`${Math.abs(step)} ${step > 0 ? 'clockwise' : 'counterclockwise'}`);
+})
+
+const baseStep: number = 1;
+let userPosition = 0;
+let userStep = 0;
+let handleRotation = 0;
+
+
+// const rotateHandle = (direction: 'clockwise' | 'counterclockwise', step: number) => {
+//   const angle = direction === 'clockwise' ? step : -step
+//   handleRotation += angle
+
+//   checkInput()
+// }
+const rotateHandle = (step: number) => {
+  handleRotation += step
+  checkInput()
+}
+
+const checkInput = () => {
+  const currentCombination = combination[userPosition];
+
+  if (currentCombination === userStep) {
+    console.log(`Position ${userPosition + 1} guessed correctly!`);
+    userPosition++;
+    userStep = 0;
+
+    if (userPosition === combination.length) {
+      openDoor()
+      console.log('Safe unlocked!');
+    }
+  } else {
+    // console.log(`Incorrect guess at position ${userPosition + 1}: .`);
+    // resetUserCombination();
+  }
+};
+
+// Reset the user's progress
+const resetUserCombination = () => {
+  // userPosition = 0;
+  console.log('Combination reset. Start over.');
+};
+
+const leftButton = document.getElementById('left-arrow')
+const rightButton = document.getElementById('right-arrow')
+
+leftButton.addEventListener('click', () => { 
+  // const step = 1;
+  userStep -= baseStep;
+  const direction = 'counterclockwise';
+  rotateHandle(userStep)
+  console.log(userStep);
+})
+
+rightButton.addEventListener('click', () => { 
+  // const step = 1;
+  userStep += baseStep;
+  const direction = 'clockwise';
+  rotateHandle(userStep)
+  console.log(userStep);
+})
+
