@@ -25,25 +25,13 @@ button {
   position: absolute;
   display: flex;
   justify-content: space-between;
-  /* align-items: center; */
   width: 100%;
-  /* transform: translateX(50%); */
 }
 
 #left-arrow {
   margin-left: 100px;
-  /* position: absolute;
-  top: 50%;
-  transform: translate(90%, -50%);
-  cursor: pointer;
-  left: 0; */
 }
 
 #right-arrow {
   margin-right: 100px;
-  /* position: absolute;
-  top: 50%;
-  transform: translate(-90%, -50%);
-  cursor: pointer;
-  right: 0; */
 }

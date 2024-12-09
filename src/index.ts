@@ -5,7 +5,6 @@ import doorImage from './assets/door.png'
 import handleImage from './assets/handle.png'
 import handleShadowImage from './assets/handleShadow.png'
 import doorOpenImage from './assets/doorOpen.png'
-import { log } from 'console'
 
 const app: PIXI.Application = new PIXI.Application()
 await app.init({ 
@@ -103,11 +102,15 @@ const generateCombination = (): number[] => {
   return combination
 }
 
-const combination: number[] = generateCombination()
+let combination: number[] = generateCombination()
 
-combination.forEach((step) => {
-  console.log(`${Math.abs(step)} ${step > 0 ? 'clockwise' : 'counterclockwise'}`);
-})
+const showCombinationInConsole = () => {
+  combination.forEach((step) => {
+    console.log(`${Math.abs(step)} ${step > 0 ? 'clockwise' : 'counterclockwise'}`);
+  })
+}
+
+showCombinationInConsole()
 
 const baseStep: number = 1;
 let userPosition = 0;
@@ -136,18 +139,50 @@ const checkInput = () => {
 
     if (userPosition === combination.length) {
       openDoor()
+      showMessage(true)
       console.log('Safe unlocked!');
     }
-  } else {
-    // console.log(`Incorrect guess at position ${userPosition + 1}: .`);
-    // resetUserCombination();
+  } else if (Math.abs(userStep) >= 9) {
+    resetGame()
+    showMessage(false)
   }
 };
 
-// Reset the user's progress
-const resetUserCombination = () => {
-  // userPosition = 0;
-  console.log('Combination reset. Start over.');
+const showMessage = (isWinner: boolean): void => {
+  const ticker = new PIXI.Ticker()
+  let scale: number = 0
+
+  const messageText = isWinner ? 'CONGRATULATIONS' : 'TRY AGAIN'
+  const messageColor = isWinner ? 0x176969 : 0x800020
+
+  const message = new PIXI.Text({ text: messageText, style: {
+    fontFamily: 'Arial',
+    fontSize: 50,
+    fill: messageColor,
+  }});
+
+  message.x = background.width / 2 - message.width / 1.5
+  message.y = 50
+  backgroundContainer.addChild(message)
+
+  ticker.add((): void => {
+    if (scale < 1) {
+      scale += 0.1
+      message.scale.set(scale)
+    } else {
+      message.scale.set(1)
+      ticker.stop()
+    }
+  })
+  ticker.start()
+};
+
+const resetGame = () => {
+  console.log('Combination reset. Start over.')
+  userPosition = 0
+  userStep = 0
+  combination = generateCombination()
+  showCombinationInConsole()
 };
 
 const leftButton = document.getElementById('left-arrow')
