@@ -7,6 +7,7 @@ import handleImage from './assets/handle.png'
 import handleShadowImage from './assets/handleShadow.png'
 import doorOpenImage from './assets/doorOpen.png'
 import blinkImage from './assets/blink.png'
+import doorOpenShadowImage from './assets/doorOpenShadow.png'
 
 const app: PIXI.Application = new PIXI.Application()
 await app.init({ 
@@ -22,7 +23,8 @@ await PIXI.Assets.load<PIXI.Texture>([
   handleImage,
   handleShadowImage,
   doorOpenImage,
-  blinkImage
+  blinkImage,
+  doorOpenShadowImage
 ])
 
 const backgroundContainer: PIXI.Container = new PIXI.Container()
@@ -69,10 +71,18 @@ handleContainer.pivot.set(handle.width / 2, handle.height / 2)
 handleContainer.x = -90
 // handleContainer.position.set(handle.x + handle.width / 2, handle.y + handle.height / 2);
 
+const doorOpenContainer: PIXI.Container = new PIXI.Container()
+doorContainer.addChild(doorOpenContainer)
+
+const doorOpenShadow: PIXI.Sprite = PIXI.Sprite.from(doorOpenShadowImage)
+doorOpenShadow.anchor.set(0.4, 0.47)
+doorOpenContainer.addChild(doorOpenShadow)
+
 const doorOpen: PIXI.Sprite = PIXI.Sprite.from(doorOpenImage)
 doorOpen.anchor.set(0.5)
-doorOpen.visible = false
-doorContainer.addChild(doorOpen)
+doorOpenContainer.visible = false
+doorOpenContainer.addChild(doorOpen)
+
 
 const blink1: PIXI.Sprite = PIXI.Sprite.from(blinkImage)
 blink1.anchor.set(0.2, -0.15)
@@ -100,9 +110,18 @@ const resizeElements = () => {
   door.y = app.screen.height / 2 - 8
   door.scale.set(scale)
 
-  doorOpen.x = app.screen.width / 2 + 460
-  doorOpen.y = app.screen.height / 2
-  doorOpen.scale.set(scale)
+
+  doorOpenContainer.x = app.screen.width / 2 + door.width / 1.4
+  doorOpenContainer.y = app.screen.height / 2
+  doorOpenContainer.scale.set(scale)
+
+  // doorOpen.x = app.screen.width / 2 + 460
+  // doorOpen.y = app.screen.height / 2
+  // doorOpen.scale.set(scale)
+
+  // doorOpenShadow.x = app.screen.width / 2 + 460
+  // doorOpenShadow.y = app.screen.height / 2
+  // doorOpenShadow.scale.set(scale)
 }
 
 // let isDoorOpened = false
@@ -110,12 +129,12 @@ const resizeElements = () => {
 const openDoor = () => {
   // isDoorOpened = true
   door.visible = false
-  doorOpen.visible = true
+  doorOpenContainer.visible = true
 }
 
 const closeDoor = () => {
   door.visible = true
-  doorOpen.visible = false
+  doorOpenContainer.visible = false
   crazyRotateHandle()
 }
 
@@ -153,7 +172,7 @@ const rotateHandle = (step: number): void => {
     rotation: rotationAngle,
     duration: 0.5,
     // duration: 0.4 + 0.05 * Math.abs(step),
-    yoyo: true,
+    // yoyo: true,
     ease: 'power2.out',
     onComplete: () => {
       checkInput();
@@ -244,7 +263,7 @@ const showMessage = (mes: string): void => {
 
 const resetGame = () => {
   userPosition = 0
-  userStep = 0
+  // userStep = 0
   rotateHandle(-userStep)
   console.log('Combination reset. Start over.')
   combination = generateCombination()
