@@ -9,6 +9,10 @@ import doorOpenImage from './assets/doorOpen.png'
 import blinkImage from './assets/blink.png'
 import doorOpenShadowImage from './assets/doorOpenShadow.png'
 
+const baseStep: number = 1;
+let userPosition: number = 0;
+let userStep: number = 0;
+
 const app: PIXI.Application = new PIXI.Application()
 await app.init({ 
   width: window.innerWidth,
@@ -32,20 +36,15 @@ app.stage.addChild(backgroundContainer)
 
 const background: PIXI.Sprite = PIXI.Sprite.from(backgroundImage)
 background.anchor.set(0.5)
-
 backgroundContainer.addChild(background)
 
 const doorContainer: PIXI.Container = new PIXI.Container()
-// doorContainer.pivot.set(0.5)
 backgroundContainer.addChild(doorContainer)
 
 const door: PIXI.Sprite = PIXI.Sprite.from(doorImage)
 door.anchor.set(0.5)
 door.width = 600
 door.height = 550
-
-// door.visible = false
-
 doorContainer.addChild(door)
 
 const handleContainer: PIXI.Container = new PIXI.Container()
@@ -56,20 +55,15 @@ handleShadow.width = 658
 handleShadow.height = 729
 handleShadow.x = 30
 handleShadow.y = 35
-
-// handleShadow.anchor.set(0.62, 0.47)
 handleContainer.addChild(handleShadow)
 
 const handle: PIXI.Sprite = PIXI.Sprite.from(handleImage)
 handle.width = 677
 handle.height = 748
-// handle.anchor.set(0.63, 0.52)
-
 handleContainer.addChild(handle)
 
 handleContainer.pivot.set(handle.width / 2, handle.height / 2)
 handleContainer.x = -90
-// handleContainer.position.set(handle.x + handle.width / 2, handle.y + handle.height / 2);
 
 const doorOpenContainer: PIXI.Container = new PIXI.Container()
 doorContainer.addChild(doorOpenContainer)
@@ -82,7 +76,6 @@ const doorOpen: PIXI.Sprite = PIXI.Sprite.from(doorOpenImage)
 doorOpen.anchor.set(0.5)
 doorOpenContainer.visible = false
 doorOpenContainer.addChild(doorOpen)
-
 
 const blink1: PIXI.Sprite = PIXI.Sprite.from(blinkImage)
 blink1.anchor.set(0.2, -0.15)
@@ -97,45 +90,22 @@ background.addChild(blink1)
 background.addChild(blink2)
 background.addChild(blink3)
 
-const resizeElements = () => {
+const resizeElements = (): void => {
   background.x = app.screen.width / 2
   background.y = app.screen.height / 2
 
-  const scaleX = app.screen.width / background.texture.width
-  const scaleY = app.screen.height / background.texture.height
-  const scale = Math.max(scaleX, scaleY)
+  const scaleX: number = app.screen.width / background.texture.width
+  const scaleY: number = app.screen.height / background.texture.height
+  const scale: number = Math.max(scaleX, scaleY)
   background.scale.set(scale)
 
   door.x = app.screen.width / 2 + 10
   door.y = app.screen.height / 2 - 8
   door.scale.set(scale)
 
-
   doorOpenContainer.x = app.screen.width / 2 + door.width / 1.4
   doorOpenContainer.y = app.screen.height / 2
   doorOpenContainer.scale.set(scale)
-
-  // doorOpen.x = app.screen.width / 2 + 460
-  // doorOpen.y = app.screen.height / 2
-  // doorOpen.scale.set(scale)
-
-  // doorOpenShadow.x = app.screen.width / 2 + 460
-  // doorOpenShadow.y = app.screen.height / 2
-  // doorOpenShadow.scale.set(scale)
-}
-
-// let isDoorOpened = false
-
-const openDoor = () => {
-  // isDoorOpened = true
-  door.visible = false
-  doorOpenContainer.visible = true
-}
-
-const closeDoor = () => {
-  door.visible = true
-  doorOpenContainer.visible = false
-  crazyRotateHandle()
 }
 
 app.renderer.on('resize', resizeElements);
@@ -152,7 +122,7 @@ const generateCombination = (): number[] => {
 
 let combination: number[] = generateCombination()
 
-const showCombinationInConsole = () => {
+const showCombinationInConsole = (): void => {
   combination.forEach((step) => {
     console.log(`${Math.abs(step)} ${step > 0 ? 'clockwise' : 'counterclockwise'}`);
   })
@@ -160,36 +130,8 @@ const showCombinationInConsole = () => {
 
 showCombinationInConsole()
 
-const baseStep: number = 1;
-let userPosition = 0;
-let userStep = 0;
-let handleRotation = 0;
-
-const rotateHandle = (step: number): void => {
-  console.log(step);
-  const rotationAngle = step * (Math.PI / 3);
-  gsap.to(handleContainer, {
-    rotation: rotationAngle,
-    duration: 0.5,
-    // duration: 0.4 + 0.05 * Math.abs(step),
-    // yoyo: true,
-    ease: 'power2.out',
-    onComplete: () => {
-      checkInput();
-    },
-  });
-}
-
-const crazyRotateHandle = (): void => {
-  gsap.to(handleContainer, {
-    rotation: handleContainer.rotation + Math.PI * 10,
-    duration: 2,
-    ease: 'power4.out',
-  });
-};
-
-const checkInput = () => {
-  const currentCombination = combination[userPosition];
+const checkInput = (): void => {
+  const currentCombination: number = combination[userPosition];
 
   if (currentCombination === userStep) {
     console.log(`Position ${userPosition + 1} guessed correctly!`)
@@ -213,34 +155,33 @@ const checkInput = () => {
     resetGame()
     showMessage("lose")
   }
-};
+}
 
-
-const showMessage = (mes: string): void => {
+const showMessage = (mes: 'win' | 'lose' | 'correct'): void => {
   const ticker = new PIXI.Ticker()
   let scale: number = 0
 
-  let messageText: string;
-  let messageColor: number;
+  let messageText: string
+  let messageColor: number
 
   if (mes === 'win') {
     messageText = 'CONGRATULATIONS!'
     messageColor = 0x176969;
   } else if (mes === 'lose') {
-    messageText = 'TRY AGAIN'
+    messageText = 'YOU LOST :( TRY AGAIN'
     messageColor = 0x800020;
   } else if (mes === 'correct') {
-    messageText = 'GOOD JOB! KEEP GOING!'
+    messageText = `YOU GUESSED POSITION ${userPosition}! KEEP GOING!`
     messageColor = 0x008000;
   }
 
   const message = new PIXI.Text({ text: messageText, style: {
-    fontFamily: 'Arial',
+    fontFamily: 'Geneva',
     fontSize: 50,
     fill: messageColor,
   }});
 
-  message.x = background.width / 2 - message.width / 1.5
+  message.x = (app.screen.width - message.width) / 2;
   message.y = 50
   backgroundContainer.addChild(message)
 
@@ -258,12 +199,43 @@ const showMessage = (mes: string): void => {
   setTimeout(() => {
     message.visible = false
   }, 3000)
-};
+}
 
+const rotateHandle = (step: number): void => {
+  console.log(step);
+  const rotationAngle: number = step * (Math.PI / 3);
+  gsap.to(handleContainer, {
+    rotation: rotationAngle,
+    duration: 0.5,
+    ease: 'power2.out',
+    onComplete: () => {
+      checkInput()
+    },
+  })
+}
 
-const resetGame = () => {
+const crazyRotateHandle = (): void => {
+  gsap.to(handleContainer, {
+    rotation: handleContainer.rotation + Math.PI * 10,
+    duration: 2,
+    ease: 'power4.out',
+  })
+}
+
+const openDoor = (): void => {
+  door.visible = false
+  doorOpenContainer.visible = true
+}
+
+const closeDoor = (): void => {
+  door.visible = true
+  doorOpenContainer.visible = false
+  crazyRotateHandle()
+}
+
+const resetGame = (): void => {
   userPosition = 0
-  // userStep = 0
+  userStep = 0
   rotateHandle(-userStep)
   console.log('Combination reset. Start over.')
   combination = generateCombination()

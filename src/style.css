@@ -2,13 +2,12 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  /* height: 100vh; */
 }
 
 body {
   display: flex;
-  /* justify-content: space-between; */
   align-items: center;
+  width: fit-content;
 }
 
 button {
@@ -26,12 +25,5 @@ button {
   display: flex;
   justify-content: space-between;
   width: 100%;
-}
-
-#left-arrow {
-  margin-left: 100px;
-}
-
-#right-arrow {
-  margin-right: 100px;
+  padding: 0 100px;
 }
